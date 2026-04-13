@@ -1,0 +1,48 @@
+name: talion
+version: 0.1.0
+author: xcore team's
+description: >
+  talion est un api gateway plus un systeme de balence 
+  de serveur 
+
+execution_mode: trusted
+entry_point: src/main.py
+framework_version: "==2.0.0"
+
+requires:
+  - name: auth
+    version: ">=0.1.0,<0.3.0"
+
+permissions: []
+
+
+resources:
+  timeout_seconds: 15
+  max_memory_mb: 256
+  max_disk_mb: 100
+  rate_limit:
+    calls: 10000
+    period_seconds: 60
+
+  runtime:
+    health_check:
+      enabled: true
+      interval_seconds: 60
+      timeout_seconds: 3
+    
+    retry:
+      max_attempts: 3
+      backoff_seconds: 3.0
+
+
+env:
+  urls:
+    auth:
+      - http://localhost:8000/app/auth/
+    user:
+      - http://localhost:8000/user
+      - http://localhost:9000/user
+  
+  algorithm: algorithm
+  proxy_timeout: 30.0
+  proxy_max_retries: 2
