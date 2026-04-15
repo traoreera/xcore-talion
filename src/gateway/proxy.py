@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING, Optional
 import logging
 
 import httpx
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.responses import StreamingResponse
-
+from xcore.kernel.api.rbac import get_current_user, AuthPayload
 from ..dependencies import HttpDep, LBDep
 
 logger = logging.getLogger("talion.gateway.proxy")
@@ -36,7 +36,7 @@ def proxy_router(env:"EnvClass"):
     router = APIRouter(tags=["proxy"])
 
     @router.api_route("/{service}/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"], summary="Proxy vers le backend",)
-    async def proxy(service: str,path: str,request: Request,lb: LBDep,client: HttpDep) -> StreamingResponse:
+    async def proxy(service: str,path: str,request: Request,lb: LBDep,client: HttpDep, user:AuthPayload= Depends(get_current_user)) -> StreamingResponse:
 
         body = await request.body()
         headers = _forward_headers(request)

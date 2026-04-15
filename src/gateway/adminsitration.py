@@ -1,10 +1,10 @@
 from typing import Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, HttpUrl
 
 from ..dependencies import LBDep
-
+from xcore.kernel.api.rbac import require_role, get_current_user, AuthPayload
 
 
 
@@ -27,7 +27,7 @@ class SetupBody(BaseModel):
 # Services
 # ----------------------------------------------------------
 def adminstration_router():
-    router = APIRouter(prefix="/admin", tags=["admin"])
+    router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_role('talion:add'))])
     @router.post("/services", status_code=201)
     async def add_service(body: AddServiceBody, lb: LBDep):
         """Ajoute un service et ses nœuds au load balancer."""
@@ -39,14 +39,14 @@ def adminstration_router():
         return {"message": f"Service '{body.name}' ajouté"}
 
 
-    @router.delete("/services/{name}")
+    @router.delete("/services/{name}", dependencies=[Depends(require_role('talion:delete'))])
     async def remove_service(name: str, lb: LBDep):
         """Supprime un service et tous ses nœuds."""
         await lb.remove_service(name)
         return {"message": f"Service '{name}' supprimé"}
 
 
-    @router.post("/setup")
+    @router.post("/setup", dependencies=[Depends(require_role('talion:add'))])
     async def setup(body: SetupBody, lb: LBDep):
         """Réinitialise complètement le load balancer."""
         await lb.setup(
@@ -60,8 +60,8 @@ def adminstration_router():
     # Health
     # ----------------------------------------------------------
 
-    @router.post("/services/{service}/nodes/unhealthy")
-    async def mark_unhealthy(service: str, url: str, lb: LBDep):
+    @router.post("/services/{service}/nodes/unhealthy", dependencies=[Depends(require_role('talion:add'))])
+    async def mark_unhealthy(service: str, url: str, lb: LBDep,):
         """Marque un nœud comme indisponible."""
         stats = await lb.get_stats()
         if service not in stats:
@@ -70,7 +70,7 @@ def adminstration_router():
         return {"message": f"Nœud '{url}' marqué unhealthy"}
 
 
-    @router.post("/services/{service}/nodes/healthy")
+    @router.post("/services/{service}/nodes/healthy",dependencies=[Depends(require_role('talion:add'))])
     async def mark_healthy(service: str, url: str, lb: LBDep):
         """Remet un nœud en service."""
         stats = await lb.get_stats()
@@ -84,8 +84,8 @@ def adminstration_router():
     # Stats
     # ----------------------------------------------------------
 
-    @router.get("/stats")
-    async def get_stats(lb: LBDep):
+    @router.get("/stats", dependencies=[Depends(require_role('talion:add'))])
+    async def get_stats(lb: LBDep, ):
         """Retourne l'état de tous les services et nœuds."""
         return await lb.get_stats()
     

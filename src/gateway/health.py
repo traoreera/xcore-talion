@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-
+from fastapi import APIRouter, Depends
+from xcore.kernel.api.rbac import require_role
 from ..dependencies import LBDep
 
 
@@ -7,7 +7,7 @@ def health_router():
     router = APIRouter(tags=["health"])
 
 
-    @router.get("/health")
+    @router.get("/health",dependencies=[ Depends(require_role('talion:list'))])
     async def health(lb: LBDep):
         """Santé de la gateway et résumé des backends."""
         stats = await lb.get_stats()
