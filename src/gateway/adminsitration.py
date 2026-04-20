@@ -27,7 +27,7 @@ class SetupBody(BaseModel):
 # Services
 # ----------------------------------------------------------
 def adminstration_router():
-    router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_role('talion:add'))])
+    router = APIRouter(prefix="/admin", tags=["Talion-admin", "Talion"], dependencies=[Depends(require_role('talion:add'))])
     @router.post("/services", status_code=201)
     async def add_service(body: AddServiceBody, lb: LBDep):
         """Ajoute un service et ses nœuds au load balancer."""

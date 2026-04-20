@@ -4,7 +4,7 @@ from ..dependencies import LBDep
 
 
 def health_router():
-    router = APIRouter(tags=["health"])
+    router = APIRouter(tags=["Talion-health", "Talion"])
 
 
     @router.get("/health",dependencies=[ Depends(require_role('talion:list'))])

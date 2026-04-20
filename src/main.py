@@ -2,9 +2,9 @@ from __future__ import annotations
 from typing import Any
 import httpx
 from .Balancer import LoadBalancer
-from xcore.sdk import TrustedBase, AutoDispatchMixin, RouterRegistry, ok, error
+from xcore.sdk import TrustedBase, AutoDispatchMixin, RouterRegistry, ok, error, action
 from .section import EnvClass
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 
 
 
@@ -25,6 +25,34 @@ class Plugin(AutoDispatchMixin, TrustedBase):
         # stage 2 : config http client
         self.http_client = httpx.AsyncClient()
 
+    @action("health")
+    async def ipc_health(self, payload: dict) -> dict:
+        stats = await self.balancer.get_stats()
+        summary = {
+            service: {
+                "total": len(nodes),
+                "healthy": sum(bool(n["healthy"]) for n in nodes),
+            }
+            for service, nodes in stats.items()
+        }
+        degraded = [s for s, v in summary.items() if v["healthy"] == 0]
+        return ok(
+            data={
+            "status":"degraded" if degraded else "ok",
+            "degraded_services":degraded,
+            "services":summary,
+            }
+        )
+
+    @action("services")
+    async def ipc_services(self, payload: dict) -> dict:
+        return ok(
+            algorithm=self.env.algorithm,
+            proxy_timeout=self.env.proxy_timeout,
+            proxy_max_retries=self.env.proxy_max_retries,
+            services=self.env.urls,
+        )
+
 
     def add_state(self) -> dict:
         return {
@@ -37,5 +65,4 @@ class Plugin(AutoDispatchMixin, TrustedBase):
     
     def get_router(self) -> Any | None:
         from .gateway import view
-        router = view(env=self.env)
-        return router
+        return view(env=self.env)

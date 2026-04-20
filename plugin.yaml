@@ -13,7 +13,16 @@ requires:
   - name: auth
     version: ">=0.1.0,<0.3.0"
 
-permissions: []
+permissions:
+  - resource: "cache.*"
+    actions: ["read", "write", "delete"]
+    effect: allow
+  - resource: "talion.health"
+    actions: ["read", "write", "execute"]
+    effect: allow
+  - resource: "talion.services"
+    actions: ["read", "write", "execute"]
+    effect: allow
 
 
 resources:
@@ -24,15 +33,15 @@ resources:
     calls: 10000
     period_seconds: 60
 
-  runtime:
-    health_check:
-      enabled: true
-      interval_seconds: 60
-      timeout_seconds: 3
-    
-    retry:
-      max_attempts: 3
-      backoff_seconds: 3.0
+runtime:
+  health_check:
+    enabled: true
+    interval_seconds: 60
+    timeout_seconds: 3
+
+  retry:
+    max_attempts: 3
+    backoff_seconds: 3.0
 
 
 env:
@@ -43,6 +52,6 @@ env:
       - http://localhost:8000/user
       - http://localhost:9000/user
   
-  algorithm: algorithm
+  algorithm: round_robin # round_robin | weighted | least_connections
   proxy_timeout: 30.0
   proxy_max_retries: 2

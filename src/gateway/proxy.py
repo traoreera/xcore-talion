@@ -33,7 +33,7 @@ def _forward_headers(request: Request) -> dict:
 
 def proxy_router(env:"EnvClass"):
 
-    router = APIRouter(tags=["proxy"])
+    router = APIRouter(tags=["Talion-proxy", "Talion"])
 
     @router.api_route("/{service}/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"], summary="Proxy vers le backend",)
     async def proxy(service: str,path: str,request: Request,lb: LBDep,client: HttpDep, user:AuthPayload= Depends(get_current_user)) -> StreamingResponse:
