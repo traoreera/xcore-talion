@@ -1,0 +1,30 @@
+{
+  "plugin": "talion",
+  "display_name": "Talion Gateway",
+  "description": "API Gateway and Load Balancer.",
+  "xflow_supported": true,
+  "ipc_actions": [
+    {
+      "name": "health",
+      "qualified_name": "talion.health",
+      "description": "Vérifier la santé des services",
+      "input_schema": {},
+      "output_schema": {
+        "status": { "type": "string" },
+        "degraded_services": { "type": "array" },
+        "services": { "type": "object" }
+      }
+    },
+    {
+      "name": "services",
+      "qualified_name": "talion.services",
+      "description": "Lister les services configurés",
+      "input_schema": {},
+      "output_schema": {
+        "algorithm": { "type": "string" },
+        "proxy_timeout": { "type": "float" },
+        "services": { "type": "object" }
+      }
+    }
+  ]
+}

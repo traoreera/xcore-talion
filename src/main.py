@@ -53,6 +53,20 @@ class Plugin(AutoDispatchMixin, TrustedBase):
             services=self.env.urls,
         )
 
+    @action("xflow.integration")
+    async def xflow_integration(self, *args, **kwargs):
+        """Lit le contrat d'intégration depuis le fichier JSON."""
+        import json
+        from pathlib import Path
+        path = Path(__file__).parent.parent / "data" / "xflow.integration.json"
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return ok(
+                    data=json.load(f)
+                )
+        except Exception as e:
+            return {"error": "integration_file_missing"}
+
 
     def add_state(self) -> dict:
         return {

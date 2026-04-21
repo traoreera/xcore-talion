@@ -23,7 +23,9 @@ permissions:
   - resource: "talion.services"
     actions: ["read", "write", "execute"]
     effect: allow
-
+  - resource: "xflow.integration"
+    actions: ['*']
+    effect: allow
 
 resources:
   timeout_seconds: 15
@@ -55,3 +57,11 @@ env:
   algorithm: round_robin # round_robin | weighted | least_connections
   proxy_timeout: 30.0
   proxy_max_retries: 2
+
+
+filesystem:
+  allowed_paths:
+    - data/
+  denied_paths:
+    - src/
+    - /

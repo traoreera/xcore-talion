@@ -1,6 +1,6 @@
 {
   "plugin": "talion",
   "version": "0.1.0",
-  "digest": "e376d75af9f3496be7c572523054a96ebdbd5a11d41be7f7f72ad9d7c6c14ebe",
+  "digest": "c2c7af239f2234e00898c7d6acd443567578157529ee709fec6b2d7f3eb5d005",
   "algo": "HMAC-SHA256"
 }
