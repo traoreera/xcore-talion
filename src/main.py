@@ -37,7 +37,7 @@ class Plugin(AutoDispatchMixin, TrustedBase):
         }
         degraded = [s for s, v in summary.items() if v["healthy"] == 0]
         return ok(
-            data={
+            result={
             "status":"degraded" if degraded else "ok",
             "degraded_services":degraded,
             "services":summary,
@@ -47,10 +47,12 @@ class Plugin(AutoDispatchMixin, TrustedBase):
     @action("services")
     async def ipc_services(self, payload: dict) -> dict:
         return ok(
-            algorithm=self.env.algorithm,
-            proxy_timeout=self.env.proxy_timeout,
-            proxy_max_retries=self.env.proxy_max_retries,
-            services=self.env.urls,
+            result={
+            "algorithm":self.env.algorithm,
+            "proxy_timeout":self.env.proxy_timeout,
+            "proxy_max_retries":self.env.proxy_max_retries,
+            "services":self.env.urls,
+            }
         )
 
     @action("xflow.integration")
@@ -62,10 +64,16 @@ class Plugin(AutoDispatchMixin, TrustedBase):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 return ok(
-                    data=json.load(f)
+                    result=json.load(f)
                 )
         except Exception as e:
-            return {"error": "integration_file_missing"}
+            return error(
+                msg=f"Failed to load integration contract: ",
+                code="integration_file_missing",
+                result={
+                    "error": "failed to load integration contract",
+                }
+            )
 
 
     def add_state(self) -> dict:
