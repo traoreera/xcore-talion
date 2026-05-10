@@ -7,11 +7,11 @@ description: >
 
 execution_mode: trusted
 entry_point: src/main.py
-framework_version: "==2.0.0"
+framework_version: "2.1.2"
 
 requires:
   - name: auth
-    version: ">=0.1.0,<0.3.0"
+    version: "1.0.0"
 
 permissions:
   - resource: "cache.*"
